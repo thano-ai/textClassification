@@ -12,6 +12,7 @@ try:
     category_mapping = joblib.load("category_mapping.pkl")
     # Reverse the category mapping for easy lookup
     reverse_category_mapping = {v: k for k, v in category_mapping.items()}
+
 except Exception as e:
     print(f"Error loading models: {e}")
     raise
