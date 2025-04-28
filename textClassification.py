@@ -4,10 +4,11 @@ import numpy as np
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from xgboost import XGBClassifier
 
 app = Flask(__name__)
 
-# Load dataset
+# Load dataset & data preprocessing
 print("Loading dataset...")
 df = pd.read_csv("Dataset.csv")
 df.columns = ["Content", "General Category", "Specific Category", "Unnamed"]
@@ -23,11 +24,17 @@ X = vectorizer.fit_transform(df['Content'])
 df['General Category'] = df['General Category'].apply(lambda x: 1 if x == "technical" else 0)
 df['Specific Category'] = df['Specific Category'].astype('category')
 category_mapping = dict(enumerate(df['Specific Category'].cat.categories))
+
+# { 0: ai, 1: cs, 2: swe }
 df['Specific Category'] = df['Specific Category'].cat.codes
+
+# { 0: 0 , 1:1, 2:2 }
 
 # Train general category model
 print("Training general category model...")
 from sklearn.model_selection import train_test_split
+
+# 4 parts
 
 X_train, X_test, y_train, y_test = train_test_split(X, df['General Category'], test_size=0.2, random_state=42)
 model = LogisticRegression()

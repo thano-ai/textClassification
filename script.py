@@ -1,7 +1,11 @@
 import requests
 
 url = "http://127.0.0.1:5000/classify"
-data = {"text": "Life in Mars"}
+data = {"text":'''New Qilin.B Ransomware Variant Emerges with Improved Encryption and Evasion Tactics
+'''  }  # <-- Change this text as needed
 
-response = requests.post(url, json=data)
-print(response.json())  # Print the classification result
+try:
+    response = requests.post(url, json=data)
+    print(response.json())  # Raw JSON response
+except Exception as e:
+    print({"error": str(e)})
