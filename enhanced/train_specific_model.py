@@ -13,8 +13,23 @@ df = pd.read_csv('NewDS.csv')
 
 # Preprocessing
 df['General Category'] = df['General Category'].fillna('non-technical')
-most_frequent = df['Specific Category'].mode()[0]
-df['Specific Category'] = df['Specific Category'].fillna(most_frequent)
+# most_frequent = df['Specific Category'].mode()[0]
+# df['Specific Category'] = df['Specific Category'].fillna(most_frequent)
+
+# Fill non-technical rows with '_'
+df['Specific Category'] = np.where(df['General Category'].str.lower() == 'non-technical',
+                                   df['Specific Category'].fillna('_'),
+                                   df['Specific Category'])
+
+# Fill technical rows with most frequent technical category (excluding '_')
+most_freq_tech = df.loc[(df['General Category'].str.lower() == 'technical') &
+                        (df['Specific Category'] != '_'), 'Specific Category'].mode()[0]
+
+df['Specific Category'] = np.where((df['General Category'].str.lower() == 'technical') &
+                                   (df['Specific Category'].isna()),
+                                   most_freq_tech,
+                                   df['Specific Category'])
+
 df['Title'] = df['Title'].fillna('')
 df['Content'] = df['Content'].fillna('')
 df['text'] = df['Title'] + " " + df['Content']
@@ -23,7 +38,8 @@ df['text'] = df['Title'] + " " + df['Content']
 df['General Category'] = df['General Category'].apply(lambda x: 1 if str(x).lower() == "technical" else 0)
 
 # Filter only technical
-tech_df = df[df['General Category'] == 1]
+# tech_df = df[df['General Category'] == 1]
+tech_df = df[(df['General Category'] == 1) & (df['Specific Category'] != '_')]
 
 if tech_df.shape[0] < 10:
     print(f"Not enough technical samples ({tech_df.shape[0]} found). Specific model training skipped.")
